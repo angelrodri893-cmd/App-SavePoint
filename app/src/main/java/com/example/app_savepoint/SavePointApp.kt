@@ -9,13 +9,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.NavType
+import com.example.app_savepoint.data.local.SavePointDatabase
+import com.example.app_savepoint.ui.modelo.juegosDemostracion
 import com.example.app_savepoint.ui.navegacion.BarraNavegacion
 import com.example.app_savepoint.ui.navegacion.Destino
 import com.example.app_savepoint.ui.pantallas.PantallaAjustes
@@ -25,10 +29,19 @@ import com.example.app_savepoint.ui.pantallas.PantallaDiario
 import com.example.app_savepoint.ui.pantallas.PantallaExplorar
 import com.example.app_savepoint.ui.theme.Acento
 import com.example.app_savepoint.ui.theme.SavePointTheme
+import com.example.app_savepoint.ui.viewmodel.DiarioViewModel
+import com.example.app_savepoint.ui.viewmodel.JuegoViewModel
+import com.example.app_savepoint.ui.viewmodel.SavePointViewModelFactory
 
 @Composable
-fun SavePointApp() {
+fun SavePointApp(baseDatos: SavePointDatabase) {
     var acento by remember { mutableStateOf(Acento.MORADO) }
+    val fabrica = remember(baseDatos) { SavePointViewModelFactory(baseDatos) }
+    val juegoViewModel: JuegoViewModel = viewModel(factory = fabrica)
+    val diarioViewModel: DiarioViewModel = viewModel(factory = fabrica)
+    val biblioteca by juegoViewModel.biblioteca.collectAsStateWithLifecycle()
+    val sesiones by diarioViewModel.sesiones.collectAsStateWithLifecycle()
+
     SavePointTheme(acento = acento) {
         val navController = rememberNavController()
         val entrada by navController.currentBackStackEntryAsState()
@@ -57,16 +70,32 @@ fun SavePointApp() {
                 composable(Destino.Explorar.ruta) {
                     PantallaExplorar { navController.navigate(Destino.detalle(it)) }
                 }
-                composable(Destino.Biblioteca.ruta) { PantallaBiblioteca() }
-                composable(Destino.Diario.ruta) { PantallaDiario() }
+                composable(Destino.Biblioteca.ruta) {
+                    PantallaBiblioteca(biblioteca, juegoViewModel::actualizarProgreso, juegoViewModel::eliminar)
+                }
+                composable(Destino.Diario.ruta) {
+                    PantallaDiario(sesiones, biblioteca) { juego, duracion, progreso, nota ->
+                        diarioViewModel.registrar(juego.juegoId, juego.titulo, duracion, progreso, nota)
+                        juegoViewModel.actualizarProgreso(juego, progreso)
+                    }
+                }
                 composable(Destino.Ajustes.ruta) { PantallaAjustes(acento) { acento = it } }
                 composable(
                     route = Destino.DETALLE,
                     arguments = listOf(navArgument("juegoId") { type = NavType.IntType })
                 ) { backStackEntry ->
+                    val juegoId = backStackEntry.arguments?.getInt("juegoId") ?: 0
+                    val juego = juegosDemostracion.firstOrNull { it.id == juegoId } ?: juegosDemostracion.first()
+                    val objetivos by remember(juegoId) { juegoViewModel.observarObjetivos(juegoId) }
+                        .collectAsStateWithLifecycle(initialValue = emptyList())
                     PantallaDetalle(
-                        juegoId = backStackEntry.arguments?.getInt("juegoId") ?: 0,
-                        alVolver = navController::navigateUp
+                        juego = juego,
+                        guardado = biblioteca.any { it.juegoId == juegoId },
+                        objetivos = objetivos,
+                        alVolver = navController::navigateUp,
+                        alGuardar = { juegoViewModel.guardar(juego) },
+                        alAgregarObjetivo = { juegoViewModel.agregarObjetivo(juegoId, it) },
+                        alAlternarObjetivo = juegoViewModel::alternarObjetivo
                     )
                 }
             }

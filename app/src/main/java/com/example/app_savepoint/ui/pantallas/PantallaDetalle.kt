@@ -17,29 +17,44 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.app_savepoint.ui.modelo.juegosDemostracion
+import com.example.app_savepoint.data.local.ObjetivoJuego
+import com.example.app_savepoint.ui.modelo.JuegoVista
 
 @Composable
-fun PantallaDetalle(juegoId: Int, alVolver: () -> Unit) {
-    val juego = juegosDemostracion.firstOrNull { it.id == juegoId } ?: juegosDemostracion.first()
-    Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-    ) {
+fun PantallaDetalle(
+    juego: JuegoVista,
+    guardado: Boolean,
+    objetivos: List<ObjetivoJuego>,
+    alVolver: () -> Unit,
+    alGuardar: () -> Unit,
+    alAgregarObjetivo: (String) -> Unit,
+    alAlternarObjetivo: (ObjetivoJuego) -> Unit
+) {
+    var mostrarObjetivo by remember { mutableStateOf(false) }
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Box(
-            modifier = Modifier.fillMaxWidth().height(260.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+            modifier = Modifier.fillMaxWidth().height(260.dp).background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.Default.SportsEsports, contentDescription = null, modifier = Modifier.size(84.dp), tint = MaterialTheme.colorScheme.primary)
@@ -51,9 +66,9 @@ fun PantallaDetalle(juegoId: Int, alVolver: () -> Unit) {
             Text(juego.titulo, style = MaterialTheme.typography.headlineLarge)
             Text(juego.genero, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(20.dp))
-            Button(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Add, contentDescription = null)
-                Text("  Agregar a mi biblioteca")
+            Button(onClick = alGuardar, modifier = Modifier.fillMaxWidth(), enabled = !guardado) {
+                Icon(if (guardado) Icons.Default.CheckCircle else Icons.Default.Add, contentDescription = null)
+                Text(if (guardado) "  Guardado en mi biblioteca" else "  Agregar a mi biblioteca")
             }
             Spacer(Modifier.height(28.dp))
             Text("Acerca del juego", style = MaterialTheme.typography.headlineSmall)
@@ -70,10 +85,22 @@ fun PantallaDetalle(juegoId: Int, alVolver: () -> Unit) {
                             Icon(Icons.Default.Flag, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
                             Text("  Objetivos personales", style = MaterialTheme.typography.titleLarge)
                         }
-                        Icon(Icons.Default.Add, contentDescription = "Agregar objetivo")
+                        IconButton(onClick = { mostrarObjetivo = true }, enabled = guardado) {
+                            Icon(Icons.Default.Add, contentDescription = "Agregar objetivo")
+                        }
                     }
-                    Spacer(Modifier.height(16.dp))
-                    Text("Todavía no tienes objetivos para este juego.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (!guardado) {
+                        Text("Guarda el juego para crear objetivos.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else if (objetivos.isEmpty()) {
+                        Text("Todavía no tienes objetivos para este juego.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        objetivos.forEach { objetivo ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = objetivo.completado, onCheckedChange = { alAlternarObjetivo(objetivo) })
+                                Text(objetivo.descripcion)
+                            }
+                        }
+                    }
                 }
             }
             Spacer(Modifier.height(32.dp))
@@ -85,4 +112,32 @@ fun PantallaDetalle(juegoId: Int, alVolver: () -> Unit) {
             Spacer(Modifier.height(24.dp))
         }
     }
+    if (mostrarObjetivo) {
+        DialogoObjetivo(
+            alCerrar = { mostrarObjetivo = false },
+            alGuardar = {
+                alAgregarObjetivo(it)
+                mostrarObjetivo = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun DialogoObjetivo(alCerrar: () -> Unit, alGuardar: (String) -> Unit) {
+    var descripcion by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = alCerrar,
+        title = { Text("Nuevo objetivo") },
+        text = {
+            OutlinedTextField(
+                value = descripcion,
+                onValueChange = { descripcion = it },
+                label = { Text("Descripción") },
+                singleLine = true
+            )
+        },
+        confirmButton = { TextButton(onClick = { alGuardar(descripcion) }, enabled = descripcion.isNotBlank()) { Text("Guardar") } },
+        dismissButton = { TextButton(onClick = alCerrar) { Text("Cancelar") } }
+    )
 }

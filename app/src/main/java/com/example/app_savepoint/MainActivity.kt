@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.example.app_savepoint.data.local.SavePointDatabase
 
 class MainActivity : ComponentActivity() {
+    private val baseDatos by lazy { SavePointDatabase.obtener(applicationContext) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { SavePointApp() }
+        setContent { SavePointApp(baseDatos) }
     }
 }

@@ -1,0 +1,222 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "aa0804d92bf1c14930fa129defee375b",
+    "entities": [
+      {
+        "tableName": "juegos_guardados",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`juegoId` INTEGER NOT NULL, `titulo` TEXT NOT NULL, `imagenUrl` TEXT NOT NULL, `genero` TEXT NOT NULL, `plataforma` TEXT NOT NULL, `estado` TEXT NOT NULL, `progreso` INTEGER NOT NULL, `fechaAgregado` INTEGER NOT NULL, PRIMARY KEY(`juegoId`))",
+        "fields": [
+          {
+            "fieldPath": "juegoId",
+            "columnName": "juegoId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titulo",
+            "columnName": "titulo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imagenUrl",
+            "columnName": "imagenUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genero",
+            "columnName": "genero",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plataforma",
+            "columnName": "plataforma",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "progreso",
+            "columnName": "progreso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaAgregado",
+            "columnName": "fechaAgregado",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "juegoId"
+          ]
+        }
+      },
+      {
+        "tableName": "sesiones_juego",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sesionId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `juegoId` INTEGER NOT NULL, `tituloJuego` TEXT NOT NULL, `fecha` INTEGER NOT NULL, `duracionMinutos` INTEGER NOT NULL, `progreso` INTEGER NOT NULL, `nota` TEXT NOT NULL, `fotoUri` TEXT, FOREIGN KEY(`juegoId`) REFERENCES `juegos_guardados`(`juegoId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "sesionId",
+            "columnName": "sesionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "juegoId",
+            "columnName": "juegoId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tituloJuego",
+            "columnName": "tituloJuego",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duracionMinutos",
+            "columnName": "duracionMinutos",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "progreso",
+            "columnName": "progreso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nota",
+            "columnName": "nota",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fotoUri",
+            "columnName": "fotoUri",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "sesionId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_sesiones_juego_juegoId",
+            "unique": false,
+            "columnNames": [
+              "juegoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_sesiones_juego_juegoId` ON `${TABLE_NAME}` (`juegoId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "juegos_guardados",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "juegoId"
+            ],
+            "referencedColumns": [
+              "juegoId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "objetivos_juego",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`objetivoId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `juegoId` INTEGER NOT NULL, `descripcion` TEXT NOT NULL, `completado` INTEGER NOT NULL, `fechaCreacion` INTEGER NOT NULL, FOREIGN KEY(`juegoId`) REFERENCES `juegos_guardados`(`juegoId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "objetivoId",
+            "columnName": "objetivoId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "juegoId",
+            "columnName": "juegoId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descripcion",
+            "columnName": "descripcion",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completado",
+            "columnName": "completado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaCreacion",
+            "columnName": "fechaCreacion",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "objetivoId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_objetivos_juego_juegoId",
+            "unique": false,
+            "columnNames": [
+              "juegoId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_objetivos_juego_juegoId` ON `${TABLE_NAME}` (`juegoId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "juegos_guardados",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "juegoId"
+            ],
+            "referencedColumns": [
+              "juegoId"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aa0804d92bf1c14930fa129defee375b')"
+    ]
+  }
+}
