@@ -1,57 +1,40 @@
 package com.example.app_savepoint.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+enum class Acento(val etiqueta: String, val color: Color, val contenedor: Color) {
+    MORADO("Morado", MoradoAcento, MoradoContenedor),
+    VERDE("Verde", VerdeAcento, VerdeContenedor),
+    ROJO("Rojo", RojoAcento, RojoContenedor)
+}
 
 @Composable
-fun AppsavepointTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+fun SavePointTheme(
+    acento: Acento = Acento.MORADO,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colores = darkColorScheme(
+        primary = acento.color,
+        onPrimary = Color(0xFF24154B),
+        primaryContainer = acento.contenedor,
+        onPrimaryContainer = TextoPrincipal,
+        secondary = VerdeAcento,
+        tertiary = RojoAcento,
+        background = FondoSavePoint,
+        onBackground = TextoPrincipal,
+        surface = SuperficieSavePoint,
+        onSurface = TextoPrincipal,
+        surfaceVariant = SuperficieElevada,
+        onSurfaceVariant = TextoSecundario,
+        outline = BordeSutil,
+        error = RojoAcento
+    )
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = colores,
         typography = Typography,
         content = content
     )
