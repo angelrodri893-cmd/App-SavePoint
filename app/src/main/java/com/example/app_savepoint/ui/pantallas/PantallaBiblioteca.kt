@@ -26,15 +26,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.app_savepoint.domain.model.EstadoJuego
-import com.example.app_savepoint.data.local.JuegoGuardado
+import com.example.app_savepoint.domain.model.JuegoBiblioteca
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.ui.componentes.EstadoVacio
 
 @Composable
 fun PantallaBiblioteca(
-    juegos: List<JuegoGuardado>,
-    alCambiarProgreso: (JuegoGuardado, Int) -> Unit,
-    alEliminar: (JuegoGuardado) -> Unit
+    juegos: List<JuegoBiblioteca>,
+    alCambiarProgreso: (JuegoBiblioteca, Int) -> Unit,
+    alEliminar: (JuegoBiblioteca) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -86,7 +86,7 @@ fun PantallaBiblioteca(
 }
 
 @Composable
-private fun ResumenBiblioteca(juegos: List<JuegoGuardado>) {
+private fun ResumenBiblioteca(juegos: List<JuegoBiblioteca>) {
     val jugando = juegos.count { it.estado == EstadoJuego.JUGANDO }
     val pendientes = juegos.count { it.estado == EstadoJuego.PENDIENTE }
     val completados = juegos.count { it.estado == EstadoJuego.COMPLETADO }

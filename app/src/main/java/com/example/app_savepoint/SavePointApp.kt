@@ -18,10 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.app_savepoint.data.local.SavePointDatabase
 import com.example.app_savepoint.domain.model.OrdenBiblioteca
-import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
-import com.example.app_savepoint.data.remote.FreeToGameApi
+import com.example.app_savepoint.domain.repository.SavePointRepository
 import com.example.app_savepoint.ui.estado.LoadState
 import com.example.app_savepoint.ui.navegacion.BarraNavegacion
 import com.example.app_savepoint.ui.navegacion.Destino
@@ -37,12 +35,8 @@ import com.example.app_savepoint.ui.viewmodel.JuegoViewModel
 import com.example.app_savepoint.ui.viewmodel.SavePointViewModelFactory
 
 @Composable
-fun SavePointApp(
-    baseDatos: SavePointDatabase,
-    preferencias: PreferenciasUsuarioDataStore,
-    api: FreeToGameApi
-) {
-    val fabrica = remember(baseDatos, preferencias, api) { SavePointViewModelFactory(baseDatos, preferencias, api) }
+fun SavePointApp(repository: SavePointRepository) {
+    val fabrica = remember(repository) { SavePointViewModelFactory(repository) }
     val juegoViewModel: JuegoViewModel = viewModel(factory = fabrica)
     val diarioViewModel: DiarioViewModel = viewModel(factory = fabrica)
     val ajustesViewModel: AjustesViewModel = viewModel(factory = fabrica)
@@ -96,8 +90,7 @@ fun SavePointApp(
                 }
                 composable(Destino.Diario.ruta) {
                     PantallaDiario(sesiones, biblioteca) { juego, duracion, progreso, nota ->
-                        diarioViewModel.registrar(juego.juegoId, juego.titulo, duracion, progreso, nota)
-                        juegoViewModel.actualizarProgreso(juego, progreso)
+                        diarioViewModel.registrar(juego, duracion, progreso, nota)
                     }
                 }
                 composable(Destino.Ajustes.ruta) {

@@ -46,20 +46,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.app_savepoint.data.local.ObjetivoJuego
 import com.example.app_savepoint.domain.model.DetalleJuego
+import com.example.app_savepoint.domain.model.Objetivo
 import com.example.app_savepoint.ui.estado.LoadState
 
 @Composable
 fun PantallaDetalle(
     estado: LoadState<DetalleJuego>,
     guardado: Boolean,
-    objetivos: List<ObjetivoJuego>,
+    objetivos: List<Objetivo>,
     alVolver: () -> Unit,
     alReintentar: () -> Unit,
     alGuardar: (DetalleJuego) -> Unit,
     alAgregarObjetivo: (String) -> Unit,
-    alAlternarObjetivo: (ObjetivoJuego) -> Unit
+    alAlternarObjetivo: (Objetivo) -> Unit
 ) {
     when (estado) {
         LoadState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -92,11 +92,11 @@ fun PantallaDetalle(
 private fun ContenidoDetalle(
     detalle: DetalleJuego,
     guardado: Boolean,
-    objetivos: List<ObjetivoJuego>,
+    objetivos: List<Objetivo>,
     alVolver: () -> Unit,
     alGuardar: () -> Unit,
     alAgregarObjetivo: (String) -> Unit,
-    alAlternarObjetivo: (ObjetivoJuego) -> Unit
+    alAlternarObjetivo: (Objetivo) -> Unit
 ) {
     val juego = detalle.juego
     var mostrarObjetivo by remember { mutableStateOf(false) }
