@@ -79,7 +79,11 @@ fun PantallaDiario(
             }
         }
         if (sesiones.isEmpty()) {
-            EstadoVacio("Aún no hay sesiones", "Registra una sesión para recordar qué jugaste y cuánto avanzaste.")
+            EstadoVacio(
+                "Aún no hay sesiones",
+                if (biblioteca.isEmpty()) "Agrega primero un juego a tu biblioteca."
+                else "Registra una sesión para recordar qué jugaste y cuánto avanzaste."
+            )
         } else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),

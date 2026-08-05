@@ -21,10 +21,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.domain.model.Acento
@@ -38,6 +40,7 @@ fun PantallaAjustes(
     alSeleccionarAcento: (Acento) -> Unit,
     alSeleccionarOrden: (OrdenBiblioteca) -> Unit
 ) {
+    val uriHandler = LocalUriHandler.current
     Column(Modifier.fillMaxSize()) {
         EncabezadoSavePoint()
         Text("Ajustes", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(16.dp))
@@ -81,7 +84,9 @@ fun PantallaAjustes(
                 Icon(Icons.Default.SportsEsports, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text("Acerca de SavePoint", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 12.dp))
                 Text("Versión 1.0", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("Datos de juegos proporcionados por FreeToGame", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 16.dp))
+                TextButton(onClick = { uriHandler.openUri("https://www.freetogame.com/") }) {
+                    Text("Datos de juegos proporcionados por FreeToGame")
+                }
             }
         }
     }
