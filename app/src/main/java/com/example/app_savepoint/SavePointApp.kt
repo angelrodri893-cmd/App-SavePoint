@@ -89,8 +89,8 @@ fun SavePointApp(repository: SavePointRepository) {
                     PantallaBiblioteca(bibliotecaOrdenada, juegoViewModel::actualizarProgreso, juegoViewModel::eliminar)
                 }
                 composable(Destino.Diario.ruta) {
-                    PantallaDiario(sesiones, biblioteca) { juego, duracion, progreso, nota ->
-                        diarioViewModel.registrar(juego, duracion, progreso, nota)
+                    PantallaDiario(sesiones, biblioteca) { juego, duracion, progreso, nota, fotoUri ->
+                        diarioViewModel.registrar(juego, duracion, progreso, nota, fotoUri)
                     }
                 }
                 composable(Destino.Ajustes.ruta) {

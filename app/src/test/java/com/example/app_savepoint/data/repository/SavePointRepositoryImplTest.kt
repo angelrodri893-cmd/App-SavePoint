@@ -58,6 +58,15 @@ class SavePointRepositoryImplTest {
         assertEquals(30, juegoDao.actualizado?.progreso)
         assertEquals(EstadoJuego.JUGANDO, juegoDao.actualizado?.estado)
     }
+
+    @Test
+    fun `registrar sesion conserva referencia de foto opcional`() = runTest {
+        val juego = JuegoBiblioteca(9, "Con foto", "", "RPG", "PC", EstadoJuego.JUGANDO, 10, 1)
+
+        repository.registrarSesion(juego, 30, 20, "Hallazgo", "file:///privado/sesion.jpg")
+
+        assertEquals("file:///privado/sesion.jpg", sesionDao.insertada?.fotoUri)
+    }
 }
 
 private class FakeJuegoDao : JuegoDao {
