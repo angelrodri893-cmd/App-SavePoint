@@ -1,7 +1,8 @@
 package com.example.app_savepoint.ui.pantallas
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,13 +43,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.example.app_savepoint.domain.model.JuegoBiblioteca
 import com.example.app_savepoint.domain.model.Sesion
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.ui.componentes.EstadoVacio
 import com.example.app_savepoint.ui.camara.CapturaCamara
+import com.example.app_savepoint.ui.camara.EstadoPermisoCamara
+import com.example.app_savepoint.ui.camara.recordarControlPermisoCamara
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -59,6 +62,7 @@ fun PantallaDiario(
     alRegistrar: (JuegoBiblioteca, Int, Int, String, String?) -> Unit
 ) {
     var mostrarFormulario by remember { mutableStateOf(false) }
+    val permisoCamara = recordarControlPermisoCamara()
     Column(Modifier.fillMaxSize()) {
         EncabezadoSavePoint()
         Row(
@@ -88,6 +92,8 @@ fun PantallaDiario(
     if (mostrarFormulario) {
         FormularioSesion(
             juego = biblioteca.first(),
+            estadoPermiso = permisoCamara.estado,
+            alSolicitarPermiso = permisoCamara.solicitar,
             alCerrar = { mostrarFormulario = false },
             alGuardar = { duracion, progreso, nota, fotoUri ->
                 alRegistrar(biblioteca.first(), duracion, progreso, nota, fotoUri)
@@ -129,6 +135,8 @@ private fun TarjetaSesion(sesion: Sesion) {
 @Composable
 private fun FormularioSesion(
     juego: JuegoBiblioteca,
+    estadoPermiso: EstadoPermisoCamara,
+    alSolicitarPermiso: () -> Unit,
     alCerrar: () -> Unit,
     alGuardar: (Int, Int, String, String?) -> Unit
 ) {
@@ -139,6 +147,14 @@ private fun FormularioSesion(
     var fotoUri by remember { mutableStateOf<String?>(null) }
     var mostrarCamara by remember { mutableStateOf(false) }
     var mensajeCamara by remember { mutableStateOf<String?>(null) }
+    var abrirTrasPermiso by remember { mutableStateOf(false) }
+
+    LaunchedEffect(estadoPermiso, abrirTrasPermiso) {
+        if (abrirTrasPermiso && estadoPermiso == EstadoPermisoCamara.CONCEDIDO) {
+            abrirTrasPermiso = false
+            mostrarCamara = true
+        }
+    }
 
     if (mostrarCamara) {
         Dialog(onDismissRequest = { mostrarCamara = false }) {
@@ -178,16 +194,34 @@ private fun FormularioSesion(
                 )
                 OutlinedTextField(value = nota, onValueChange = { nota = it }, label = { Text("Nota") })
                 Button(onClick = {
-                    if (ContextCompat.checkSelfPermission(contexto, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        mostrarCamara = true
-                    } else {
-                        mensajeCamara = "Se necesita permiso de cámara para adjuntar una foto."
+                    when (estadoPermiso) {
+                        EstadoPermisoCamara.CONCEDIDO -> mostrarCamara = true
+                        EstadoPermisoCamara.RECHAZADO_PERMANENTE -> {
+                            mensajeCamara = "El permiso está bloqueado. Puedes habilitarlo en Ajustes o guardar sin foto."
+                        }
+                        EstadoPermisoCamara.SIN_SOLICITAR,
+                        EstadoPermisoCamara.RECHAZADO -> {
+                            abrirTrasPermiso = true
+                            alSolicitarPermiso()
+                        }
                     }
                 }) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Text(if (fotoUri == null) "  Agregar foto" else "  Repetir foto")
                 }
                 mensajeCamara?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                if (estadoPermiso == EstadoPermisoCamara.RECHAZADO) {
+                    Text("La foto es opcional. Puedes volver a solicitar el permiso o guardar la sesión sin ella.")
+                }
+                if (estadoPermiso == EstadoPermisoCamara.RECHAZADO_PERMANENTE) {
+                    TextButton(onClick = {
+                        contexto.startActivity(
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package", contexto.packageName, null)
+                            }
+                        )
+                    }) { Text("Abrir ajustes de la app") }
+                }
                 fotoUri?.let { uri ->
                     AsyncImage(
                         model = uri,
