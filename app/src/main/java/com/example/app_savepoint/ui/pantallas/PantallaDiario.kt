@@ -1,5 +1,8 @@
 package com.example.app_savepoint.ui.pantallas
 
+import android.Manifest
+import android.content.pm.PackageManager
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,8 +17,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,12 +35,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import com.example.app_savepoint.domain.model.JuegoBiblioteca
 import com.example.app_savepoint.domain.model.Sesion
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.ui.componentes.EstadoVacio
+import com.example.app_savepoint.ui.camara.CapturaCamara
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -44,7 +53,7 @@ import java.time.format.DateTimeFormatter
 fun PantallaDiario(
     sesiones: List<Sesion>,
     biblioteca: List<JuegoBiblioteca>,
-    alRegistrar: (JuegoBiblioteca, Int, Int, String) -> Unit
+    alRegistrar: (JuegoBiblioteca, Int, Int, String, String?) -> Unit
 ) {
     var mostrarFormulario by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
@@ -77,8 +86,8 @@ fun PantallaDiario(
         FormularioSesion(
             juego = biblioteca.first(),
             alCerrar = { mostrarFormulario = false },
-            alGuardar = { duracion, progreso, nota ->
-                alRegistrar(biblioteca.first(), duracion, progreso, nota)
+            alGuardar = { duracion, progreso, nota, fotoUri ->
+                alRegistrar(biblioteca.first(), duracion, progreso, nota, fotoUri)
                 mostrarFormulario = false
             }
         )
@@ -110,11 +119,35 @@ private fun TarjetaSesion(sesion: Sesion) {
 private fun FormularioSesion(
     juego: JuegoBiblioteca,
     alCerrar: () -> Unit,
-    alGuardar: (Int, Int, String) -> Unit
+    alGuardar: (Int, Int, String, String?) -> Unit
 ) {
+    val contexto = LocalContext.current
     var duracion by remember { mutableStateOf("60") }
     var progreso by remember { mutableStateOf(juego.progreso.toString()) }
     var nota by remember { mutableStateOf("") }
+    var fotoUri by remember { mutableStateOf<String?>(null) }
+    var mostrarCamara by remember { mutableStateOf(false) }
+    var mensajeCamara by remember { mutableStateOf<String?>(null) }
+
+    if (mostrarCamara) {
+        Dialog(onDismissRequest = { mostrarCamara = false }) {
+            androidx.compose.material3.Surface(shape = RoundedCornerShape(18.dp)) {
+                CapturaCamara(
+                    alCapturar = {
+                        fotoUri = it
+                        mensajeCamara = "Fotografía lista para guardar"
+                        mostrarCamara = false
+                    },
+                    alCancelar = { mostrarCamara = false },
+                    alError = {
+                        mensajeCamara = it
+                        mostrarCamara = false
+                    }
+                )
+            }
+        }
+        return
+    }
     AlertDialog(
         onDismissRequest = alCerrar,
         title = { Text("Nueva sesión · ${juego.titulo}") },
@@ -133,10 +166,21 @@ private fun FormularioSesion(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(value = nota, onValueChange = { nota = it }, label = { Text("Nota") })
+                Button(onClick = {
+                    if (ContextCompat.checkSelfPermission(contexto, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        mostrarCamara = true
+                    } else {
+                        mensajeCamara = "Se necesita permiso de cámara para adjuntar una foto."
+                    }
+                }) {
+                    Icon(Icons.Default.CameraAlt, contentDescription = null)
+                    Text(if (fotoUri == null) "  Agregar foto" else "  Repetir foto")
+                }
+                mensajeCamara?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
         },
         confirmButton = {
-            TextButton(onClick = { alGuardar(duracion.toIntOrNull() ?: 1, progreso.toIntOrNull() ?: 0, nota) }) { Text("Guardar") }
+            TextButton(onClick = { alGuardar(duracion.toIntOrNull() ?: 1, progreso.toIntOrNull() ?: 0, nota, fotoUri) }) { Text("Guardar") }
         },
         dismissButton = { TextButton(onClick = alCerrar) { Text("Cancelar") } }
     )
