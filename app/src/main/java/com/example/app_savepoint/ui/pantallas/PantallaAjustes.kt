@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,10 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
+import com.example.app_savepoint.data.local.OrdenBiblioteca
 import com.example.app_savepoint.ui.theme.Acento
 
 @Composable
-fun PantallaAjustes(acento: Acento, alSeleccionarAcento: (Acento) -> Unit) {
+fun PantallaAjustes(
+    acento: Acento,
+    orden: OrdenBiblioteca,
+    alSeleccionarAcento: (Acento) -> Unit,
+    alSeleccionarOrden: (OrdenBiblioteca) -> Unit
+) {
     Column(Modifier.fillMaxSize()) {
         EncabezadoSavePoint()
         Text("Ajustes", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(16.dp))
@@ -53,6 +60,21 @@ fun PantallaAjustes(acento: Acento, alSeleccionarAcento: (Acento) -> Unit) {
                 }
             }
         }
+        Card(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+            Column(Modifier.padding(16.dp)) {
+                Text("Orden de biblioteca", style = MaterialTheme.typography.titleLarge)
+                OrdenBiblioteca.entries.forEach { opcion ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable { alSeleccionarOrden(opcion) },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = opcion == orden, onClick = { alSeleccionarOrden(opcion) })
+                        Text(opcion.etiqueta)
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
         Card(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
             Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Default.SportsEsports, contentDescription = null, tint = MaterialTheme.colorScheme.primary)

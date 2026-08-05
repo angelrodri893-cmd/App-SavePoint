@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,6 +17,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.app_savepoint.data.local.SavePointDatabase
+import com.example.app_savepoint.data.local.OrdenBiblioteca
+import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
 import com.example.app_savepoint.ui.modelo.juegosDemostracion
 import com.example.app_savepoint.ui.navegacion.BarraNavegacion
 import com.example.app_savepoint.ui.navegacion.Destino
@@ -27,22 +27,30 @@ import com.example.app_savepoint.ui.pantallas.PantallaBiblioteca
 import com.example.app_savepoint.ui.pantallas.PantallaDetalle
 import com.example.app_savepoint.ui.pantallas.PantallaDiario
 import com.example.app_savepoint.ui.pantallas.PantallaExplorar
-import com.example.app_savepoint.ui.theme.Acento
 import com.example.app_savepoint.ui.theme.SavePointTheme
+import com.example.app_savepoint.ui.viewmodel.AjustesViewModel
 import com.example.app_savepoint.ui.viewmodel.DiarioViewModel
 import com.example.app_savepoint.ui.viewmodel.JuegoViewModel
 import com.example.app_savepoint.ui.viewmodel.SavePointViewModelFactory
 
 @Composable
-fun SavePointApp(baseDatos: SavePointDatabase) {
-    var acento by remember { mutableStateOf(Acento.MORADO) }
-    val fabrica = remember(baseDatos) { SavePointViewModelFactory(baseDatos) }
+fun SavePointApp(baseDatos: SavePointDatabase, preferencias: PreferenciasUsuarioDataStore) {
+    val fabrica = remember(baseDatos, preferencias) { SavePointViewModelFactory(baseDatos, preferencias) }
     val juegoViewModel: JuegoViewModel = viewModel(factory = fabrica)
     val diarioViewModel: DiarioViewModel = viewModel(factory = fabrica)
+    val ajustesViewModel: AjustesViewModel = viewModel(factory = fabrica)
     val biblioteca by juegoViewModel.biblioteca.collectAsStateWithLifecycle()
     val sesiones by diarioViewModel.sesiones.collectAsStateWithLifecycle()
+    val ajustes by ajustesViewModel.ajustes.collectAsStateWithLifecycle()
+    val bibliotecaOrdenada = remember(biblioteca, ajustes.ordenBiblioteca) {
+        when (ajustes.ordenBiblioteca) {
+            OrdenBiblioteca.RECIENTES -> biblioteca.sortedByDescending { it.fechaAgregado }
+            OrdenBiblioteca.TITULO -> biblioteca.sortedBy { it.titulo.lowercase() }
+            OrdenBiblioteca.PROGRESO -> biblioteca.sortedByDescending { it.progreso }
+        }
+    }
 
-    SavePointTheme(acento = acento) {
+    SavePointTheme(acento = ajustes.acento) {
         val navController = rememberNavController()
         val entrada by navController.currentBackStackEntryAsState()
         val rutaActual = entrada?.destination?.route
@@ -71,7 +79,7 @@ fun SavePointApp(baseDatos: SavePointDatabase) {
                     PantallaExplorar { navController.navigate(Destino.detalle(it)) }
                 }
                 composable(Destino.Biblioteca.ruta) {
-                    PantallaBiblioteca(biblioteca, juegoViewModel::actualizarProgreso, juegoViewModel::eliminar)
+                    PantallaBiblioteca(bibliotecaOrdenada, juegoViewModel::actualizarProgreso, juegoViewModel::eliminar)
                 }
                 composable(Destino.Diario.ruta) {
                     PantallaDiario(sesiones, biblioteca) { juego, duracion, progreso, nota ->
@@ -79,7 +87,14 @@ fun SavePointApp(baseDatos: SavePointDatabase) {
                         juegoViewModel.actualizarProgreso(juego, progreso)
                     }
                 }
-                composable(Destino.Ajustes.ruta) { PantallaAjustes(acento) { acento = it } }
+                composable(Destino.Ajustes.ruta) {
+                    PantallaAjustes(
+                        acento = ajustes.acento,
+                        orden = ajustes.ordenBiblioteca,
+                        alSeleccionarAcento = ajustesViewModel::seleccionarAcento,
+                        alSeleccionarOrden = ajustesViewModel::seleccionarOrden
+                    )
+                }
                 composable(
                     route = Destino.DETALLE,
                     arguments = listOf(navArgument("juegoId") { type = NavType.IntType })
