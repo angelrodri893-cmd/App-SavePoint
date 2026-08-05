@@ -4,12 +4,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.example.app_savepoint.domain.model.Acento
 
-enum class Acento(val etiqueta: String, val color: Color, val contenedor: Color) {
-    MORADO("Morado", MoradoAcento, MoradoContenedor),
-    VERDE("Verde", VerdeAcento, VerdeContenedor),
-    ROJO("Rojo", RojoAcento, RojoContenedor)
-}
+val Acento.color: Color
+    get() = when (this) {
+        Acento.MORADO -> MoradoAcento
+        Acento.VERDE -> VerdeAcento
+        Acento.ROJO -> RojoAcento
+    }
+
+private val Acento.contenedor: Color
+    get() = when (this) {
+        Acento.MORADO -> MoradoContenedor
+        Acento.VERDE -> VerdeContenedor
+        Acento.ROJO -> RojoContenedor
+    }
 
 @Composable
 fun SavePointTheme(
