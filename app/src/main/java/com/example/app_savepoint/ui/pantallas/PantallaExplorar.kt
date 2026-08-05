@@ -39,7 +39,9 @@ import com.example.app_savepoint.ui.estado.LoadState
 @Composable
 fun PantallaExplorar(
     estado: LoadState<List<Juego>>,
+    totalJuegosLocales: Int,
     alReintentar: () -> Unit,
+    alAbrirBiblioteca: () -> Unit,
     alAbrirDetalle: (Int) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
@@ -65,7 +67,12 @@ fun PantallaExplorar(
             LoadState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
-            is LoadState.Error -> ErrorCatalogo(estado.mensaje, alReintentar)
+            is LoadState.Error -> ErrorCatalogo(
+                mensaje = estado.mensaje,
+                totalJuegosLocales = totalJuegosLocales,
+                alReintentar = alReintentar,
+                alAbrirBiblioteca = alAbrirBiblioteca
+            )
             is LoadState.Content -> {
                 val juegosFiltrados = remember(estado.data, consulta, plataforma) {
                     estado.data.filter { juego ->
@@ -105,7 +112,12 @@ fun PantallaExplorar(
 }
 
 @Composable
-private fun ErrorCatalogo(mensaje: String, alReintentar: () -> Unit) {
+private fun ErrorCatalogo(
+    mensaje: String,
+    totalJuegosLocales: Int,
+    alReintentar: () -> Unit,
+    alAbrirBiblioteca: () -> Unit
+) {
     Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(24.dp),
@@ -116,6 +128,10 @@ private fun ErrorCatalogo(mensaje: String, alReintentar: () -> Unit) {
             Text("Conexión perdida", style = MaterialTheme.typography.titleLarge)
             Text(mensaje, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Button(onClick = alReintentar) { Text("Reintentar") }
+            if (totalJuegosLocales > 0) {
+                Text("Tus $totalJuegosLocales juegos guardados y el Diario siguen disponibles sin conexión.")
+                TextButton(onClick = alAbrirBiblioteca) { Text("Abrir mi biblioteca") }
+            }
         }
     }
 }
