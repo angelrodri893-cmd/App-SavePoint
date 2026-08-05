@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,7 +22,7 @@ import com.example.app_savepoint.data.local.SavePointDatabase
 import com.example.app_savepoint.data.local.OrdenBiblioteca
 import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
 import com.example.app_savepoint.data.remote.FreeToGameApi
-import com.example.app_savepoint.ui.modelo.juegosDemostracion
+import com.example.app_savepoint.ui.modelo.LoadState
 import com.example.app_savepoint.ui.navegacion.BarraNavegacion
 import com.example.app_savepoint.ui.navegacion.Destino
 import com.example.app_savepoint.ui.pantallas.PantallaAjustes
@@ -48,6 +50,7 @@ fun SavePointApp(
     val sesiones by diarioViewModel.sesiones.collectAsStateWithLifecycle()
     val ajustes by ajustesViewModel.ajustes.collectAsStateWithLifecycle()
     val catalogo by juegoViewModel.catalogo.collectAsStateWithLifecycle()
+    val detalle by juegoViewModel.detalle.collectAsStateWithLifecycle()
     val bibliotecaOrdenada = remember(biblioteca, ajustes.ordenBiblioteca) {
         when (ajustes.ordenBiblioteca) {
             OrdenBiblioteca.RECIENTES -> biblioteca.sortedByDescending { it.fechaAgregado }
@@ -110,15 +113,19 @@ fun SavePointApp(
                     arguments = listOf(navArgument("juegoId") { type = NavType.IntType })
                 ) { backStackEntry ->
                     val juegoId = backStackEntry.arguments?.getInt("juegoId") ?: 0
-                    val juego = juegosDemostracion.firstOrNull { it.id == juegoId } ?: juegosDemostracion.first()
+                    LaunchedEffect(juegoId) { juegoViewModel.cargarDetalle(juegoId) }
+                    DisposableEffect(juegoId) {
+                        onDispose { juegoViewModel.limpiarDetalle() }
+                    }
                     val objetivos by remember(juegoId) { juegoViewModel.observarObjetivos(juegoId) }
                         .collectAsStateWithLifecycle(initialValue = emptyList())
                     PantallaDetalle(
-                        juego = juego,
+                        estado = detalle ?: LoadState.Loading,
                         guardado = biblioteca.any { it.juegoId == juegoId },
                         objetivos = objetivos,
                         alVolver = navController::navigateUp,
-                        alGuardar = { juegoViewModel.guardar(juego) },
+                        alReintentar = { juegoViewModel.cargarDetalle(juegoId) },
+                        alGuardar = { juegoViewModel.guardar(it.juego) },
                         alAgregarObjetivo = { juegoViewModel.agregarObjetivo(juegoId, it) },
                         alAlternarObjetivo = juegoViewModel::alternarObjetivo
                     )
