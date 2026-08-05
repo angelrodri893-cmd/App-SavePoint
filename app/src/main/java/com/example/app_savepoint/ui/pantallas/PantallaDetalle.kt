@@ -47,17 +47,17 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.app_savepoint.data.local.ObjetivoJuego
-import com.example.app_savepoint.ui.modelo.JuegoDetalleVista
-import com.example.app_savepoint.ui.modelo.LoadState
+import com.example.app_savepoint.domain.model.DetalleJuego
+import com.example.app_savepoint.ui.estado.LoadState
 
 @Composable
 fun PantallaDetalle(
-    estado: LoadState<JuegoDetalleVista>,
+    estado: LoadState<DetalleJuego>,
     guardado: Boolean,
     objetivos: List<ObjetivoJuego>,
     alVolver: () -> Unit,
     alReintentar: () -> Unit,
-    alGuardar: (JuegoDetalleVista) -> Unit,
+    alGuardar: (DetalleJuego) -> Unit,
     alAgregarObjetivo: (String) -> Unit,
     alAlternarObjetivo: (ObjetivoJuego) -> Unit
 ) {
@@ -90,7 +90,7 @@ fun PantallaDetalle(
 
 @Composable
 private fun ContenidoDetalle(
-    detalle: JuegoDetalleVista,
+    detalle: DetalleJuego,
     guardado: Boolean,
     objetivos: List<ObjetivoJuego>,
     alVolver: () -> Unit,

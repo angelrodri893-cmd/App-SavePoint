@@ -1,4 +1,4 @@
-package com.example.app_savepoint.ui.modelo
+package com.example.app_savepoint.data.mapper
 
 import com.example.app_savepoint.data.remote.JuegoRemotoDto
 import org.junit.Assert.assertEquals
@@ -6,7 +6,7 @@ import org.junit.Test
 
 class JuegoMapperTest {
     @Test
-    fun `dto se convierte al modelo visible`() {
+    fun `dto se convierte al modelo de dominio`() {
         val dto = JuegoRemotoDto(
             id = 12,
             title = "Juego de prueba",
@@ -21,11 +21,11 @@ class JuegoMapperTest {
             profileUrl = "https://profile"
         )
 
-        val vista = dto.aVista()
+        val juego = dto.aDominio()
 
-        assertEquals(12, vista.id)
-        assertEquals("Juego de prueba", vista.titulo)
-        assertEquals("Web Browser", vista.plataforma)
-        assertEquals("https://img/juego.jpg", vista.imagenUrl)
+        assertEquals(12, juego.id)
+        assertEquals("Juego de prueba", juego.titulo)
+        assertEquals("Web Browser", juego.plataforma)
+        assertEquals("https://img/juego.jpg", juego.imagenUrl)
     }
 }

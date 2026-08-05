@@ -31,12 +31,12 @@ import com.example.app_savepoint.ui.componentes.CampoBusqueda
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.ui.componentes.EstadoVacio
 import com.example.app_savepoint.ui.componentes.TarjetaJuego
-import com.example.app_savepoint.ui.modelo.JuegoVista
-import com.example.app_savepoint.ui.modelo.LoadState
+import com.example.app_savepoint.domain.model.Juego
+import com.example.app_savepoint.ui.estado.LoadState
 
 @Composable
 fun PantallaExplorar(
-    estado: LoadState<List<JuegoVista>>,
+    estado: LoadState<List<Juego>>,
     alReintentar: () -> Unit,
     alAbrirDetalle: (Int) -> Unit
 ) {

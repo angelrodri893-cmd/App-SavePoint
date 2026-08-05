@@ -4,24 +4,15 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.app_savepoint.ui.theme.Acento
+import com.example.app_savepoint.domain.model.Acento
+import com.example.app_savepoint.domain.model.AjustesUsuario
+import com.example.app_savepoint.domain.model.OrdenBiblioteca
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 private val Context.preferenciasSavePoint by preferencesDataStore(name = "preferencias_savepoint")
-
-enum class OrdenBiblioteca(val etiqueta: String) {
-    RECIENTES("Recientes"),
-    TITULO("Título"),
-    PROGRESO("Progreso")
-}
-
-data class AjustesUsuario(
-    val acento: Acento = Acento.MORADO,
-    val ordenBiblioteca: OrdenBiblioteca = OrdenBiblioteca.RECIENTES
-)
 
 class PreferenciasUsuarioDataStore(private val contexto: Context) {
     private object Claves {

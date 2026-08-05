@@ -2,16 +2,16 @@ package com.example.app_savepoint.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.app_savepoint.data.local.EstadoJuego
+import com.example.app_savepoint.domain.model.EstadoJuego
 import com.example.app_savepoint.data.local.JuegoDao
 import com.example.app_savepoint.data.local.JuegoGuardado
 import com.example.app_savepoint.data.local.ObjetivoDao
 import com.example.app_savepoint.data.local.ObjetivoJuego
 import com.example.app_savepoint.data.remote.FreeToGameApi
-import com.example.app_savepoint.ui.modelo.JuegoDetalleVista
-import com.example.app_savepoint.ui.modelo.JuegoVista
-import com.example.app_savepoint.ui.modelo.LoadState
-import com.example.app_savepoint.ui.modelo.aVista
+import com.example.app_savepoint.data.mapper.aDominio
+import com.example.app_savepoint.domain.model.DetalleJuego
+import com.example.app_savepoint.domain.model.Juego
+import com.example.app_savepoint.ui.estado.LoadState
 import java.io.IOException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,10 +28,10 @@ class JuegoViewModel(
     val biblioteca: StateFlow<List<JuegoGuardado>> = juegoDao.observarBiblioteca()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    private val _catalogo = MutableStateFlow<LoadState<List<JuegoVista>>>(LoadState.Loading)
+    private val _catalogo = MutableStateFlow<LoadState<List<Juego>>>(LoadState.Loading)
     val catalogo = _catalogo.asStateFlow()
 
-    private val _detalle = MutableStateFlow<LoadState<JuegoDetalleVista>?>(null)
+    private val _detalle = MutableStateFlow<LoadState<DetalleJuego>?>(null)
     val detalle = _detalle.asStateFlow()
 
     init {
@@ -42,7 +42,7 @@ class JuegoViewModel(
         viewModelScope.launch {
             _catalogo.value = LoadState.Loading
             _catalogo.value = try {
-                LoadState.Content(api.obtenerJuegos().map { it.aVista() })
+                LoadState.Content(api.obtenerJuegos().map { it.aDominio() })
             } catch (error: Exception) {
                 LoadState.Error(mensajeDe(error))
             }
@@ -53,7 +53,7 @@ class JuegoViewModel(
         viewModelScope.launch {
             _detalle.value = LoadState.Loading
             _detalle.value = try {
-                LoadState.Content(api.obtenerDetalle(juegoId).aVista())
+                LoadState.Content(api.obtenerDetalle(juegoId).aDominio())
             } catch (error: Exception) {
                 LoadState.Error(mensajeDe(error))
             }
@@ -66,7 +66,7 @@ class JuegoViewModel(
 
     fun observarObjetivos(juegoId: Int) = objetivoDao.observarObjetivos(juegoId)
 
-    fun guardar(juego: JuegoVista) {
+    fun guardar(juego: Juego) {
         viewModelScope.launch {
             juegoDao.guardar(
                 JuegoGuardado(

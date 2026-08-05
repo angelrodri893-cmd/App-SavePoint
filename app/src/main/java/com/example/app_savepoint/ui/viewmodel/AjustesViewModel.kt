@@ -2,10 +2,10 @@ package com.example.app_savepoint.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.app_savepoint.data.local.AjustesUsuario
-import com.example.app_savepoint.data.local.OrdenBiblioteca
+import com.example.app_savepoint.domain.model.Acento
+import com.example.app_savepoint.domain.model.AjustesUsuario
+import com.example.app_savepoint.domain.model.OrdenBiblioteca
 import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
-import com.example.app_savepoint.ui.theme.Acento
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn

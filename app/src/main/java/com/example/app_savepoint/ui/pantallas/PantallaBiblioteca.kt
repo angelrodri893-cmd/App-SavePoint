@@ -25,7 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.app_savepoint.data.local.EstadoJuego
+import com.example.app_savepoint.domain.model.EstadoJuego
 import com.example.app_savepoint.data.local.JuegoGuardado
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.ui.componentes.EstadoVacio

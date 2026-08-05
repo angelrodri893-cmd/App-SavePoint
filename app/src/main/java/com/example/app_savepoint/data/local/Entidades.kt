@@ -4,13 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-
-enum class EstadoJuego {
-    PENDIENTE,
-    JUGANDO,
-    PAUSADO,
-    COMPLETADO
-}
+import com.example.app_savepoint.domain.model.EstadoJuego
 
 @Entity(tableName = "juegos_guardados")
 data class JuegoGuardado(

@@ -27,8 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
-import com.example.app_savepoint.data.local.OrdenBiblioteca
-import com.example.app_savepoint.ui.theme.Acento
+import com.example.app_savepoint.domain.model.Acento
+import com.example.app_savepoint.domain.model.OrdenBiblioteca
+import com.example.app_savepoint.ui.theme.color
 
 @Composable
 fun PantallaAjustes(
