@@ -37,6 +37,10 @@ fun BarraNavegacion(
                 },
                 label = { Text(destino.etiqueta) },
                 colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     indicatorColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )

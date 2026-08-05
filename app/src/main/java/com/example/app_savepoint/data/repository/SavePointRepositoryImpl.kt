@@ -22,6 +22,7 @@ import com.example.app_savepoint.domain.model.OrdenBiblioteca
 import com.example.app_savepoint.domain.model.Sesion
 import com.example.app_savepoint.domain.repository.SavePointRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.File
 
@@ -74,7 +75,9 @@ class SavePointRepositoryImpl(
     }
 
     override suspend fun eliminarJuego(juego: JuegoBiblioteca) {
+        val sesionesDelJuego = sesionDao.observarSesionesDeJuego(juego.juegoId).first()
         juegoDao.eliminar(juego.aEntidad())
+        sesionesDelJuego.forEach { eliminarArchivoFoto(it.fotoUri) }
     }
 
     override suspend fun agregarObjetivo(juegoId: Int, descripcion: String) {
@@ -109,12 +112,16 @@ class SavePointRepositoryImpl(
 
     override suspend fun eliminarSesion(sesion: Sesion) {
         sesionDao.eliminar(sesion.aEntidad())
-        sesion.fotoUri?.let { uri ->
-            Uri.parse(uri).path?.let { ruta -> runCatching { File(ruta).delete() } }
-        }
+        eliminarArchivoFoto(sesion.fotoUri)
     }
 
     override suspend fun guardarAcento(acento: Acento) = preferencias.guardarAcento(acento)
 
     override suspend fun guardarOrden(orden: OrdenBiblioteca) = preferencias.guardarOrden(orden)
+
+    private fun eliminarArchivoFoto(fotoUri: String?) {
+        fotoUri?.let { uri ->
+            Uri.parse(uri).path?.let { ruta -> runCatching { File(ruta).delete() } }
+        }
+    }
 }
