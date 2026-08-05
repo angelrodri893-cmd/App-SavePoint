@@ -4,7 +4,7 @@ import com.example.app_savepoint.data.local.JuegoDao
 import com.example.app_savepoint.data.local.JuegoGuardado
 import com.example.app_savepoint.data.local.ObjetivoDao
 import com.example.app_savepoint.data.local.ObjetivoJuego
-import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
+import com.example.app_savepoint.data.local.PreferenciasFuenteLocal
 import com.example.app_savepoint.data.local.SesionDao
 import com.example.app_savepoint.data.local.SesionJuego
 import com.example.app_savepoint.data.mapper.aDominio
@@ -27,7 +27,7 @@ class SavePointRepositoryImpl(
     private val juegoDao: JuegoDao,
     private val sesionDao: SesionDao,
     private val objetivoDao: ObjetivoDao,
-    private val preferencias: PreferenciasUsuarioDataStore,
+    private val preferencias: PreferenciasFuenteLocal,
     private val api: FreeToGameApi
 ) : SavePointRepository {
     override val biblioteca: Flow<List<JuegoBiblioteca>> =

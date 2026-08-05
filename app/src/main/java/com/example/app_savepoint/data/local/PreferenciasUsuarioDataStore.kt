@@ -14,13 +14,19 @@ import kotlinx.coroutines.flow.map
 
 private val Context.preferenciasSavePoint by preferencesDataStore(name = "preferencias_savepoint")
 
-class PreferenciasUsuarioDataStore(private val contexto: Context) {
+interface PreferenciasFuenteLocal {
+    val ajustes: Flow<AjustesUsuario>
+    suspend fun guardarAcento(acento: Acento)
+    suspend fun guardarOrden(orden: OrdenBiblioteca)
+}
+
+class PreferenciasUsuarioDataStore(private val contexto: Context) : PreferenciasFuenteLocal {
     private object Claves {
         val acento = stringPreferencesKey("acento")
         val ordenBiblioteca = stringPreferencesKey("orden_biblioteca")
     }
 
-    val ajustes: Flow<AjustesUsuario> = contexto.preferenciasSavePoint.data
+    override val ajustes: Flow<AjustesUsuario> = contexto.preferenciasSavePoint.data
         .catch { error ->
             if (error is IOException) emit(androidx.datastore.preferences.core.emptyPreferences())
             else throw error
@@ -35,11 +41,11 @@ class PreferenciasUsuarioDataStore(private val contexto: Context) {
             )
         }
 
-    suspend fun guardarAcento(acento: Acento) {
+    override suspend fun guardarAcento(acento: Acento) {
         contexto.preferenciasSavePoint.edit { it[Claves.acento] = acento.name }
     }
 
-    suspend fun guardarOrden(orden: OrdenBiblioteca) {
+    override suspend fun guardarOrden(orden: OrdenBiblioteca) {
         contexto.preferenciasSavePoint.edit { it[Claves.ordenBiblioteca] = orden.name }
     }
 }
