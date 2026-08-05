@@ -1,7 +1,9 @@
 package com.example.app_savepoint.data.remote
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class JuegoRemotoDto(
     val id: Int,
     val title: String,
@@ -16,6 +18,7 @@ data class JuegoRemotoDto(
     @SerializedName("freetogame_profile_url") val profileUrl: String
 )
 
+@Keep
 data class JuegoDetalleDto(
     val id: Int,
     val title: String,
@@ -34,6 +37,7 @@ data class JuegoDetalleDto(
     val screenshots: List<CapturaDto> = emptyList()
 )
 
+@Keep
 data class RequisitosDto(
     val os: String?,
     val processor: String?,
@@ -42,4 +46,5 @@ data class RequisitosDto(
     val storage: String?
 )
 
+@Keep
 data class CapturaDto(val id: Int, val image: String)
