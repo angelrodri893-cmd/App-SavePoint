@@ -26,12 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.app_savepoint.R
 import com.example.app_savepoint.ui.modelo.JuegoVista
 import com.example.app_savepoint.ui.theme.TarjetaOscura
+import coil.compose.AsyncImage
 
 @Composable
 fun EncabezadoSavePoint(modifier: Modifier = Modifier) {
@@ -89,12 +91,22 @@ fun TarjetaJuego(
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_control_completo),
-                    contentDescription = null,
-                    modifier = Modifier.size(42.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-                )
+                if (juego.imagenUrl.isBlank()) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_control_completo),
+                        contentDescription = null,
+                        modifier = Modifier.size(42.dp),
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                    )
+                } else {
+                    AsyncImage(
+                        model = juego.imagenUrl,
+                        contentDescription = "Portada de ${juego.titulo}",
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(R.drawable.ic_control_completo)
+                    )
+                }
             }
             Column(
                 modifier = Modifier.padding(16.dp).weight(1f),
