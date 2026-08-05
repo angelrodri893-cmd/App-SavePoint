@@ -51,6 +51,7 @@ import com.example.app_savepoint.ui.componentes.EstadoVacio
 import com.example.app_savepoint.ui.camara.CapturaCamara
 import com.example.app_savepoint.ui.camara.EstadoPermisoCamara
 import com.example.app_savepoint.ui.camara.recordarControlPermisoCamara
+import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -152,6 +153,10 @@ private fun FormularioSesion(
     var mostrarCamara by remember { mutableStateOf(false) }
     var mensajeCamara by remember { mutableStateOf<String?>(null) }
     var abrirTrasPermiso by remember { mutableStateOf(false) }
+    val cancelarFormulario = {
+        eliminarFotoTemporal(fotoUri)
+        alCerrar()
+    }
 
     LaunchedEffect(estadoPermiso, abrirTrasPermiso) {
         if (abrirTrasPermiso && estadoPermiso == EstadoPermisoCamara.CONCEDIDO) {
@@ -165,6 +170,7 @@ private fun FormularioSesion(
             androidx.compose.material3.Surface(shape = RoundedCornerShape(18.dp)) {
                 CapturaCamara(
                     alCapturar = {
+                        if (fotoUri != it) eliminarFotoTemporal(fotoUri)
                         fotoUri = it
                         mensajeCamara = "Fotografía lista para guardar"
                         mostrarCamara = false
@@ -180,7 +186,7 @@ private fun FormularioSesion(
         return
     }
     AlertDialog(
-        onDismissRequest = alCerrar,
+        onDismissRequest = cancelarFormulario,
         title = { Text("Nueva sesión · ${juego.titulo}") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -239,6 +245,12 @@ private fun FormularioSesion(
         confirmButton = {
             TextButton(onClick = { alGuardar(duracion.toIntOrNull() ?: 1, progreso.toIntOrNull() ?: 0, nota, fotoUri) }) { Text("Guardar") }
         },
-        dismissButton = { TextButton(onClick = alCerrar) { Text("Cancelar") } }
+        dismissButton = { TextButton(onClick = cancelarFormulario) { Text("Cancelar") } }
     )
+}
+
+private fun eliminarFotoTemporal(fotoUri: String?) {
+    fotoUri?.let { uri ->
+        Uri.parse(uri).path?.let { ruta -> runCatching { File(ruta).delete() } }
+    }
 }

@@ -83,4 +83,4 @@ sequenceDiagram
 - `ObjetivoJuego`: objetivos asociados mediante clave foránea.
 - DataStore: acento global y orden de Biblioteca.
 
-Eliminar un juego aplica `CASCADE` sobre sus sesiones y objetivos. Las fotografías se borran cuando se elimina explícitamente su sesión mediante el repositorio.
+Eliminar un juego aplica `CASCADE` sobre sus sesiones y objetivos. El repositorio también borra las fotografías asociadas; una captura cancelada se elimina antes de cerrar el formulario.
