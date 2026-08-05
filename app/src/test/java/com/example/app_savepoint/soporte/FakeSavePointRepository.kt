@@ -20,6 +20,7 @@ class FakeSavePointRepository : SavePointRepository {
 
     var catalogo: Result<List<Juego>> = Result.success(emptyList())
     var detalle: Result<DetalleJuego>? = null
+    var sesionRegistrada: DatosSesionRegistrada? = null
 
     override suspend fun obtenerCatalogo(): List<Juego> = catalogo.getOrThrow()
     override suspend fun obtenerDetalle(juegoId: Int): DetalleJuego = requireNotNull(detalle).getOrThrow()
@@ -35,8 +36,18 @@ class FakeSavePointRepository : SavePointRepository {
         progreso: Int,
         nota: String,
         fotoUri: String?
-    ) = Unit
+    ) {
+        sesionRegistrada = DatosSesionRegistrada(juego, duracionMinutos, progreso, nota, fotoUri)
+    }
     override suspend fun eliminarSesion(sesion: Sesion) = Unit
     override suspend fun guardarAcento(acento: Acento) = Unit
     override suspend fun guardarOrden(orden: OrdenBiblioteca) = Unit
 }
+
+data class DatosSesionRegistrada(
+    val juego: JuegoBiblioteca,
+    val duracionMinutos: Int,
+    val progreso: Int,
+    val nota: String,
+    val fotoUri: String?
+)
