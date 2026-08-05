@@ -47,6 +47,7 @@ fun SavePointApp(
     val biblioteca by juegoViewModel.biblioteca.collectAsStateWithLifecycle()
     val sesiones by diarioViewModel.sesiones.collectAsStateWithLifecycle()
     val ajustes by ajustesViewModel.ajustes.collectAsStateWithLifecycle()
+    val catalogo by juegoViewModel.catalogo.collectAsStateWithLifecycle()
     val bibliotecaOrdenada = remember(biblioteca, ajustes.ordenBiblioteca) {
         when (ajustes.ordenBiblioteca) {
             OrdenBiblioteca.RECIENTES -> biblioteca.sortedByDescending { it.fechaAgregado }
@@ -81,7 +82,11 @@ fun SavePointApp(
                 modifier = Modifier.padding(padding)
             ) {
                 composable(Destino.Explorar.ruta) {
-                    PantallaExplorar { navController.navigate(Destino.detalle(it)) }
+                    PantallaExplorar(
+                        estado = catalogo,
+                        alReintentar = juegoViewModel::cargarCatalogo,
+                        alAbrirDetalle = { navController.navigate(Destino.detalle(it)) }
+                    )
                 }
                 composable(Destino.Biblioteca.ruta) {
                     PantallaBiblioteca(bibliotecaOrdenada, juegoViewModel::actualizarProgreso, juegoViewModel::eliminar)
