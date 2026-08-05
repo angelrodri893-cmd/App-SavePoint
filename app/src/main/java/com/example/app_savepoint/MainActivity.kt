@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.app_savepoint.data.local.SavePointDatabase
 import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
+import com.example.app_savepoint.data.remote.FreeToGameClient
 
 class MainActivity : ComponentActivity() {
     private val baseDatos by lazy { SavePointDatabase.obtener(applicationContext) }
@@ -14,6 +15,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { SavePointApp(baseDatos, preferencias) }
+        setContent { SavePointApp(baseDatos, preferencias, FreeToGameClient.api) }
     }
 }

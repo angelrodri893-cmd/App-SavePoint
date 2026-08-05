@@ -19,6 +19,7 @@ import androidx.navigation.navArgument
 import com.example.app_savepoint.data.local.SavePointDatabase
 import com.example.app_savepoint.data.local.OrdenBiblioteca
 import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
+import com.example.app_savepoint.data.remote.FreeToGameApi
 import com.example.app_savepoint.ui.modelo.juegosDemostracion
 import com.example.app_savepoint.ui.navegacion.BarraNavegacion
 import com.example.app_savepoint.ui.navegacion.Destino
@@ -34,8 +35,12 @@ import com.example.app_savepoint.ui.viewmodel.JuegoViewModel
 import com.example.app_savepoint.ui.viewmodel.SavePointViewModelFactory
 
 @Composable
-fun SavePointApp(baseDatos: SavePointDatabase, preferencias: PreferenciasUsuarioDataStore) {
-    val fabrica = remember(baseDatos, preferencias) { SavePointViewModelFactory(baseDatos, preferencias) }
+fun SavePointApp(
+    baseDatos: SavePointDatabase,
+    preferencias: PreferenciasUsuarioDataStore,
+    api: FreeToGameApi
+) {
+    val fabrica = remember(baseDatos, preferencias, api) { SavePointViewModelFactory(baseDatos, preferencias, api) }
     val juegoViewModel: JuegoViewModel = viewModel(factory = fabrica)
     val diarioViewModel: DiarioViewModel = viewModel(factory = fabrica)
     val ajustesViewModel: AjustesViewModel = viewModel(factory = fabrica)
