@@ -7,18 +7,62 @@ import com.example.app_savepoint.data.local.JuegoDao
 import com.example.app_savepoint.data.local.JuegoGuardado
 import com.example.app_savepoint.data.local.ObjetivoDao
 import com.example.app_savepoint.data.local.ObjetivoJuego
+import com.example.app_savepoint.data.remote.FreeToGameApi
+import com.example.app_savepoint.ui.modelo.JuegoDetalleVista
 import com.example.app_savepoint.ui.modelo.JuegoVista
+import com.example.app_savepoint.ui.modelo.LoadState
+import com.example.app_savepoint.ui.modelo.aVista
+import java.io.IOException
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class JuegoViewModel(
     private val juegoDao: JuegoDao,
-    private val objetivoDao: ObjetivoDao
+    private val objetivoDao: ObjetivoDao,
+    private val api: FreeToGameApi
 ) : ViewModel() {
     val biblioteca: StateFlow<List<JuegoGuardado>> = juegoDao.observarBiblioteca()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val _catalogo = MutableStateFlow<LoadState<List<JuegoVista>>>(LoadState.Loading)
+    val catalogo = _catalogo.asStateFlow()
+
+    private val _detalle = MutableStateFlow<LoadState<JuegoDetalleVista>?>(null)
+    val detalle = _detalle.asStateFlow()
+
+    init {
+        cargarCatalogo()
+    }
+
+    fun cargarCatalogo() {
+        viewModelScope.launch {
+            _catalogo.value = LoadState.Loading
+            _catalogo.value = try {
+                LoadState.Content(api.obtenerJuegos().map { it.aVista() })
+            } catch (error: Exception) {
+                LoadState.Error(mensajeDe(error))
+            }
+        }
+    }
+
+    fun cargarDetalle(juegoId: Int) {
+        viewModelScope.launch {
+            _detalle.value = LoadState.Loading
+            _detalle.value = try {
+                LoadState.Content(api.obtenerDetalle(juegoId).aVista())
+            } catch (error: Exception) {
+                LoadState.Error(mensajeDe(error))
+            }
+        }
+    }
+
+    fun limpiarDetalle() {
+        _detalle.value = null
+    }
 
     fun observarObjetivos(juegoId: Int) = objetivoDao.observarObjetivos(juegoId)
 
@@ -28,7 +72,7 @@ class JuegoViewModel(
                 JuegoGuardado(
                     juegoId = juego.id,
                     titulo = juego.titulo,
-                    imagenUrl = "",
+                    imagenUrl = juego.imagenUrl,
                     genero = juego.genero,
                     plataforma = juego.plataforma
                 )
@@ -63,5 +107,10 @@ class JuegoViewModel(
 
     fun alternarObjetivo(objetivo: ObjetivoJuego) {
         viewModelScope.launch { objetivoDao.actualizar(objetivo.copy(completado = !objetivo.completado)) }
+    }
+
+    private fun mensajeDe(error: Exception): String = when (error) {
+        is IOException -> "No hay conexión. Revisa tu red e inténtalo de nuevo."
+        else -> "No se pudieron cargar los juegos. Inténtalo de nuevo."
     }
 }
