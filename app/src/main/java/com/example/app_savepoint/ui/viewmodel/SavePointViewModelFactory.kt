@@ -2,23 +2,14 @@ package com.example.app_savepoint.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.app_savepoint.data.local.SavePointDatabase
-import com.example.app_savepoint.data.local.PreferenciasUsuarioDataStore
-import com.example.app_savepoint.data.remote.FreeToGameApi
+import com.example.app_savepoint.domain.repository.SavePointRepository
 
-class SavePointViewModelFactory(
-    private val baseDatos: SavePointDatabase,
-    private val preferencias: PreferenciasUsuarioDataStore,
-    private val api: FreeToGameApi
-) : ViewModelProvider.Factory {
+class SavePointViewModelFactory(private val repository: SavePointRepository) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
-        modelClass.isAssignableFrom(JuegoViewModel::class.java) ->
-            JuegoViewModel(baseDatos.juegoDao(), baseDatos.objetivoDao(), api) as T
-        modelClass.isAssignableFrom(DiarioViewModel::class.java) ->
-            DiarioViewModel(baseDatos.sesionDao()) as T
-        modelClass.isAssignableFrom(AjustesViewModel::class.java) ->
-            AjustesViewModel(preferencias) as T
+        modelClass.isAssignableFrom(JuegoViewModel::class.java) -> JuegoViewModel(repository) as T
+        modelClass.isAssignableFrom(DiarioViewModel::class.java) -> DiarioViewModel(repository) as T
+        modelClass.isAssignableFrom(AjustesViewModel::class.java) -> AjustesViewModel(repository) as T
         else -> error("ViewModel no registrado: ${modelClass.name}")
     }
 }

@@ -32,8 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.app_savepoint.data.local.JuegoGuardado
-import com.example.app_savepoint.data.local.SesionJuego
+import com.example.app_savepoint.domain.model.JuegoBiblioteca
+import com.example.app_savepoint.domain.model.Sesion
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
 import com.example.app_savepoint.ui.componentes.EstadoVacio
 import java.time.Instant
@@ -42,9 +42,9 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun PantallaDiario(
-    sesiones: List<SesionJuego>,
-    biblioteca: List<JuegoGuardado>,
-    alRegistrar: (JuegoGuardado, Int, Int, String) -> Unit
+    sesiones: List<Sesion>,
+    biblioteca: List<JuegoBiblioteca>,
+    alRegistrar: (JuegoBiblioteca, Int, Int, String) -> Unit
 ) {
     var mostrarFormulario by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize()) {
@@ -86,7 +86,7 @@ fun PantallaDiario(
 }
 
 @Composable
-private fun TarjetaSesion(sesion: SesionJuego) {
+private fun TarjetaSesion(sesion: Sesion) {
     val fecha = remember(sesion.fecha) {
         Instant.ofEpochMilli(sesion.fecha).atZone(ZoneId.systemDefault())
             .format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
@@ -108,7 +108,7 @@ private fun TarjetaSesion(sesion: SesionJuego) {
 
 @Composable
 private fun FormularioSesion(
-    juego: JuegoGuardado,
+    juego: JuegoBiblioteca,
     alCerrar: () -> Unit,
     alGuardar: (Int, Int, String) -> Unit
 ) {

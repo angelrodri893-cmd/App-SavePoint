@@ -1,4 +1,4 @@
-package com.example.app_savepoint.ui.modelo
+package com.example.app_savepoint.ui.estado
 
 sealed interface LoadState<out T> {
     data object Loading : LoadState<Nothing>

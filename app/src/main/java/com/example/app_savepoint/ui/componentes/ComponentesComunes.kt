@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.app_savepoint.R
-import com.example.app_savepoint.ui.modelo.JuegoVista
+import com.example.app_savepoint.domain.model.Juego
 import com.example.app_savepoint.ui.theme.TarjetaOscura
 import coil.compose.AsyncImage
 
@@ -76,7 +76,7 @@ fun EstadoVacio(
 
 @Composable
 fun TarjetaJuego(
-    juego: JuegoVista,
+    juego: Juego,
     alSeleccionar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
