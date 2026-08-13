@@ -1,5 +1,6 @@
 package com.example.app_savepoint.data.repository
 
+import android.net.Uri
 import com.example.app_savepoint.data.local.JuegoDao
 import com.example.app_savepoint.data.local.JuegoGuardado
 import com.example.app_savepoint.data.local.ObjetivoDao
@@ -22,6 +23,7 @@ import com.example.app_savepoint.domain.model.Sesion
 import com.example.app_savepoint.domain.repository.SavePointRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.io.File
 
 class SavePointRepositoryImpl(
     private val juegoDao: JuegoDao,
@@ -107,6 +109,9 @@ class SavePointRepositoryImpl(
 
     override suspend fun eliminarSesion(sesion: Sesion) {
         sesionDao.eliminar(sesion.aEntidad())
+        sesion.fotoUri?.let { uri ->
+            Uri.parse(uri).path?.let { ruta -> runCatching { File(ruta).delete() } }
+        }
     }
 
     override suspend fun guardarAcento(acento: Acento) = preferencias.guardarAcento(acento)
