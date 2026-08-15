@@ -32,13 +32,7 @@ class PreferenciasUsuarioDataStore(private val contexto: Context) : Preferencias
             else throw error
         }
         .map { preferencias ->
-            AjustesUsuario(
-                acento = preferencias[Claves.acento]?.let { runCatching { Acento.valueOf(it) }.getOrNull() }
-                    ?: Acento.MORADO,
-                ordenBiblioteca = preferencias[Claves.ordenBiblioteca]
-                    ?.let { runCatching { OrdenBiblioteca.valueOf(it) }.getOrNull() }
-                    ?: OrdenBiblioteca.RECIENTES
-            )
+            decodificarAjustes(preferencias[Claves.acento], preferencias[Claves.ordenBiblioteca])
         }
 
     override suspend fun guardarAcento(acento: Acento) {
@@ -49,3 +43,9 @@ class PreferenciasUsuarioDataStore(private val contexto: Context) : Preferencias
         contexto.preferenciasSavePoint.edit { it[Claves.ordenBiblioteca] = orden.name }
     }
 }
+
+internal fun decodificarAjustes(acento: String?, orden: String?): AjustesUsuario = AjustesUsuario(
+    acento = acento?.let { runCatching { Acento.valueOf(it) }.getOrNull() } ?: Acento.MORADO,
+    ordenBiblioteca = orden?.let { runCatching { OrdenBiblioteca.valueOf(it) }.getOrNull() }
+        ?: OrdenBiblioteca.RECIENTES
+)

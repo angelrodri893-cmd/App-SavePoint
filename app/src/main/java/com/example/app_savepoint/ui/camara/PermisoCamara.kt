@@ -44,13 +44,11 @@ fun recordarControlPermisoCamara(): ControlPermisoCamara {
         )
     }
     val lanzador = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
-        estado = when {
-            concedido -> EstadoPermisoCamara.CONCEDIDO
-            actividad?.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) == true ->
-                EstadoPermisoCamara.RECHAZADO
-            solicitado -> EstadoPermisoCamara.RECHAZADO_PERMANENTE
-            else -> EstadoPermisoCamara.RECHAZADO
-        }
+        estado = resolverEstadoPermiso(
+            concedido = concedido,
+            mostrarJustificacion = actividad?.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) == true,
+            solicitado = solicitado
+        )
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -63,6 +61,17 @@ fun recordarControlPermisoCamara(): ControlPermisoCamara {
         solicitado = true
         lanzador.launch(Manifest.permission.CAMERA)
     }
+}
+
+internal fun resolverEstadoPermiso(
+    concedido: Boolean,
+    mostrarJustificacion: Boolean,
+    solicitado: Boolean
+): EstadoPermisoCamara = when {
+    concedido -> EstadoPermisoCamara.CONCEDIDO
+    mostrarJustificacion -> EstadoPermisoCamara.RECHAZADO
+    solicitado -> EstadoPermisoCamara.RECHAZADO_PERMANENTE
+    else -> EstadoPermisoCamara.SIN_SOLICITAR
 }
 
 private tailrec fun Context.encontrarActividad(): Activity? = when (this) {

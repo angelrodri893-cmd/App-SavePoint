@@ -81,7 +81,9 @@ fun SavePointApp(repository: SavePointRepository) {
                 composable(Destino.Explorar.ruta) {
                     PantallaExplorar(
                         estado = catalogo,
+                        totalJuegosLocales = biblioteca.size,
                         alReintentar = juegoViewModel::cargarCatalogo,
+                        alAbrirBiblioteca = { navController.navigate(Destino.Biblioteca.ruta) },
                         alAbrirDetalle = { navController.navigate(Destino.detalle(it)) }
                     )
                 }
