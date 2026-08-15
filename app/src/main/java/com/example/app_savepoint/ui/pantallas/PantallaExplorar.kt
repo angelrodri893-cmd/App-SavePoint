@@ -120,7 +120,7 @@ private fun ErrorCatalogo(
 ) {
     Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp),
+            modifier = Modifier.fillMaxWidth().padding(24.dp), //esta seccion sirve para que el texto no se corte
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
