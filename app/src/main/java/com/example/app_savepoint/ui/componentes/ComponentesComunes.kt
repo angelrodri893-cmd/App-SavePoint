@@ -1,6 +1,5 @@
 package com.example.app_savepoint.ui.componentes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DesktopWindows
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Card
@@ -27,13 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.app_savepoint.R
 import com.example.app_savepoint.domain.model.Juego
 import com.example.app_savepoint.ui.theme.TarjetaOscura
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 
 @Composable
 fun EncabezadoSavePoint(modifier: Modifier = Modifier) {
@@ -85,43 +84,66 @@ fun TarjetaJuego(
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = TarjetaOscura)
     ) {
-        Row(modifier = Modifier.height(128.dp)) {
+        Row(modifier = Modifier.height(144.dp)) {
             Box(
-                modifier = Modifier.size(width = 128.dp, height = 128.dp)
+                modifier = Modifier.size(width = 144.dp, height = 144.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 if (juego.imagenUrl.isBlank()) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_control_completo),
+                    Icon(
+                        imageVector = Icons.Default.SportsEsports,
                         contentDescription = null,
                         modifier = Modifier.size(42.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 } else {
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model = juego.imagenUrl,
                         contentDescription = "Portada de ${juego.titulo}",
                         modifier = Modifier.matchParentSize(),
                         contentScale = ContentScale.Crop,
-                        error = painterResource(R.drawable.ic_control_completo)
+                        error = {
+                            Box(Modifier.matchParentSize(), contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.SportsEsports,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(42.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                     )
                 }
             }
             Column(
-                modifier = Modifier.padding(16.dp).weight(1f),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(juego.titulo, style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = juego.titulo,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Spacer(Modifier.height(4.dp))
-                Text(juego.genero, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(18.dp))
+                Text(
+                    text = juego.genero,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_pc),
+                    Icon(
+                        imageVector = if (juego.plataforma.contains("Web", ignoreCase = true)) {
+                            Icons.Default.Language
+                        } else {
+                            Icons.Default.DesktopWindows
+                        },
                         contentDescription = "Disponible en ${juego.plataforma}",
                         modifier = Modifier.size(18.dp),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text("  ${juego.plataforma}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

@@ -1,18 +1,26 @@
 package com.example.app_savepoint.ui.navegacion
 
-import androidx.annotation.DrawableRes
-import com.example.app_savepoint.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SportsEsports
+import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Destino(
     val ruta: String,
     val etiqueta: String,
-    @param:DrawableRes val iconoActivo: Int,
-    @param:DrawableRes val iconoInactivo: Int
+    val iconoActivo: ImageVector,
+    val iconoInactivo: ImageVector
 ) {
-    data object Explorar : Destino("explorar", "Explorar", R.drawable.ic_explorar_completo, R.drawable.ic_explorar_trazado)
-    data object Biblioteca : Destino("biblioteca", "Biblioteca", R.drawable.ic_control_completo, R.drawable.ic_control_trazado)
-    data object Diario : Destino("diario", "Diario", R.drawable.ic_diario_completo, R.drawable.ic_diario_trazado)
-    data object Ajustes : Destino("ajustes", "Ajustes", R.drawable.ic_ajustes_completo, R.drawable.ic_ajustes_trazado)
+    data object Explorar : Destino("explorar", "Explorar", Icons.Filled.Explore, Icons.Outlined.Explore)
+    data object Biblioteca : Destino("biblioteca", "Biblioteca", Icons.Filled.SportsEsports, Icons.Outlined.SportsEsports)
+    data object Diario : Destino("diario", "Diario", Icons.Filled.Bookmark, Icons.Outlined.BookmarkBorder)
+    data object Ajustes : Destino("ajustes", "Ajustes", Icons.Filled.Settings, Icons.Outlined.Settings)
 
     companion object {
         val principales = listOf(Explorar, Biblioteca, Diario, Ajustes)

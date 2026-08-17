@@ -1,16 +1,14 @@
 package com.example.app_savepoint.ui.navegacion
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -25,14 +23,10 @@ fun BarraNavegacion(
                 selected = seleccionado,
                 onClick = { alNavegar(destino) },
                 icon = {
-                    Image(
-                        painter = painterResource(if (seleccionado) destino.iconoActivo else destino.iconoInactivo),
+                    Icon(
+                        imageVector = if (seleccionado) destino.iconoActivo else destino.iconoInactivo,
                         contentDescription = destino.etiqueta,
-                        modifier = Modifier.size(22.dp),
-                        colorFilter = ColorFilter.tint(
-                            if (seleccionado) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 label = { Text(destino.etiqueta) },
