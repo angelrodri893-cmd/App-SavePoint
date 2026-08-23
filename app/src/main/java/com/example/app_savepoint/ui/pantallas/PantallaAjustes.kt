@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.SportsEsports
@@ -41,7 +43,12 @@ fun PantallaAjustes(
     alSeleccionarOrden: (OrdenBiblioteca) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 24.dp)
+    ) {
         EncabezadoSavePoint()
         Text("Ajustes", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(16.dp))
         Card(modifier = Modifier.padding(16.dp).fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
@@ -83,7 +90,7 @@ fun PantallaAjustes(
             Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Default.SportsEsports, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 Text("Acerca de SavePoint", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 12.dp))
-                Text("Versión 1.0", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Versión 1.0.0", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 TextButton(onClick = { uriHandler.openUri("https://www.freetogame.com/") }) {
                     Text("Datos de juegos proporcionados por FreeToGame")
                 }

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -103,6 +104,12 @@ private fun ContenidoDetalle(
     val uriHandler = LocalUriHandler.current
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Box(modifier = Modifier.fillMaxWidth().height(260.dp).background(MaterialTheme.colorScheme.surfaceVariant)) {
+            Icon(
+                imageVector = Icons.Default.SportsEsports,
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.Center).size(72.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
             AsyncImage(
                 model = detalle.capturas.firstOrNull() ?: juego.imagenUrl,
                 contentDescription = "Imagen principal de ${juego.titulo}",

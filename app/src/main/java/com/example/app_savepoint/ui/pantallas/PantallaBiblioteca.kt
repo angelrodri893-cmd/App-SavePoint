@@ -1,6 +1,7 @@
 package com.example.app_savepoint.ui.pantallas
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,10 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.example.app_savepoint.R
+import coil.compose.SubcomposeAsyncImage
 import com.example.app_savepoint.domain.model.EstadoJuego
 import com.example.app_savepoint.domain.model.JuegoBiblioteca
 import com.example.app_savepoint.ui.componentes.EncabezadoSavePoint
@@ -60,12 +60,20 @@ fun PantallaBiblioteca(
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         if (juego.imagenUrl.isNotBlank()) {
-                            AsyncImage(
+                            SubcomposeAsyncImage(
                                 model = juego.imagenUrl,
                                 contentDescription = "Portada de ${juego.titulo}",
                                 modifier = Modifier.fillMaxWidth().height(170.dp),
                                 contentScale = ContentScale.Crop,
-                                error = painterResource(R.drawable.ic_control_completo)
+                                error = {
+                                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.Default.SportsEsports,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
                             )
                             Spacer(Modifier.height(14.dp))
                         }
