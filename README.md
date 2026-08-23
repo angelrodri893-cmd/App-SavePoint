@@ -17,13 +17,24 @@ El proyecto fue desarrollado como proyecto academico de Jetpack Compose, Navigat
 - Orden de biblioteca por fecha, título o progreso.
 - Estados visibles de carga, contenido, error, vacío y reintento.
 
-Los datos remotos son proporcionados por [FreeToGame](https://www.freetogame.com/). La aplicación no requiere API Key.
-
 ## Capturas
 
 | Explorar | Detalle | Ajustes |
 |---|---|---|
 | ![Explorar](docs/capturas/explorar.png) | ![Detalle](docs/capturas/detalle.png) | ![Ajustes](docs/capturas/ajustes.png) |
+
+## API utilizada
+
+SavePoint utiliza la API pública de [FreeToGame](https://www.freetogame.com/api-doc) para obtener el catálogo y los detalles de videojuegos gratuitos.
+
+La integración se realiza mediante **Retrofit** y **Gson**, encargados de efectuar las solicitudes HTTP y convertir las respuestas JSON en objetos utilizados por la aplicación.
+
+Se consumen los siguientes endpoints:
+
+- `/games`: obtiene el catálogo de videojuegos.
+- `/game?id={id}`: obtiene la información detallada de un juego.
+
+La API no requiere una clave de acceso (**API Key**). Los juegos obtenidos pueden consultarse desde la sección **Explorar** y guardarse posteriormente en la biblioteca local del usuario.
 
 ## Estructura
 
@@ -63,8 +74,6 @@ Los ViewModels no importan DAOs, Retrofit ni DataStore. Sólo dependen de `SaveP
 2. Esperar la sincronización de Gradle.
 3. Seleccionar un emulador o dispositivo.
 4. Ejecutar la configuración `app`.
-
-No se necesita una clave para FreeToGame.
 
 ## Verificación
 
