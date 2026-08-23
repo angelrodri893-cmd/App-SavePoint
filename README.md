@@ -2,7 +2,7 @@
 
 SavePoint es un diario personal de videojuegos para Android. Permite explorar el catálogo gratuito de FreeToGame, guardar juegos, actualizar su progreso, crear objetivos y registrar sesiones con una fotografía opcional.
 
-El proyecto fue desarrollado como demostración académica de Jetpack Compose, Navigation, MVVM, Repository, Clean Architecture, Room, DataStore, Retrofit, StateFlow y CameraX.
+El proyecto fue desarrollado como proyecto academico de Jetpack Compose, Navigation, MVVM, Repository, Clean Architecture, Room, DataStore, Retrofit, StateFlow y CameraX.
 
 ## Funciones principales
 
@@ -24,23 +24,6 @@ Los datos remotos son proporcionados por [FreeToGame](https://www.freetogame.com
 | Explorar | Detalle | Ajustes |
 |---|---|---|
 | ![Explorar](docs/capturas/explorar.png) | ![Detalle](docs/capturas/detalle.png) | ![Ajustes](docs/capturas/ajustes.png) |
-
-## Arquitectura
-
-```mermaid
-flowchart LR
-    UI["Compose UI"] --> VM["ViewModels + StateFlow"]
-    VM --> RP["SavePointRepository"]
-    RP --> RI["SavePointRepositoryImpl"]
-    RI --> API["Retrofit · FreeToGame"]
-    RI --> ROOM["Room"]
-    RI --> DS["DataStore"]
-    UI --> CAM["CameraX"]
-    CAM --> PRIVATE["Almacenamiento privado"]
-    PRIVATE --> ROOM
-```
-
-La explicación completa está en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 
 ## Estructura
 
@@ -89,8 +72,6 @@ No se necesita una clave para FreeToGame.
 .\gradlew.bat test
 .\gradlew.bat assembleDebug
 ```
-
-Para generar la entrega release, consultar [docs/GENERAR_ENTREGA.md](docs/GENERAR_ENTREGA.md).
 
 ## Privacidad y permisos
 
