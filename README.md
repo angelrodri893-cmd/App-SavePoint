@@ -36,6 +36,19 @@ Se consumen los siguientes endpoints:
 
 La API no requiere una clave de acceso (**API Key**). Los juegos obtenidos pueden consultarse desde la sección **Explorar** y guardarse posteriormente en la biblioteca local del usuario.
 
+## Arquitectura
+
+SavePoint está organizada utilizando **Clean Architecture**, el patrón **MVVM** y el patrón **Repository**, separando las responsabilidades de la aplicación en diferentes capas:
+
+- **UI:** contiene las pantallas desarrolladas con Jetpack Compose, los componentes visuales y los ViewModels responsables del estado de la interfaz.
+- **Domain:** define los modelos y contratos principales de la aplicación sin depender de tecnologías específicas.
+- **Data:** implementa el acceso a la API de FreeToGame, la base de datos local con Room y las preferencias mediante DataStore.
+- **DI:** proporciona y conecta las dependencias utilizadas por las diferentes capas.
+
+La interfaz se comunica con los ViewModels mediante `StateFlow`. Los ViewModels acceden al repositorio a través de sus contratos, mientras que el repositorio decide si los datos deben obtenerse desde la API o desde el almacenamiento local.
+
+Esta estructura facilita el mantenimiento, las pruebas y la incorporación de nuevas funcionalidades sin afectar directamente al resto de la aplicación.
+
 ## Estructura
 
 ```text
