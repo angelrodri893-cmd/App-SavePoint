@@ -24,6 +24,11 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -96,12 +101,12 @@ fun PantallaDiario(
     }
     if (mostrarFormulario) {
         FormularioSesion(
-            juego = biblioteca.first(),
+            biblioteca = biblioteca,
             estadoPermiso = permisoCamara.estado,
             alSolicitarPermiso = permisoCamara.solicitar,
             alCerrar = { mostrarFormulario = false },
-            alGuardar = { duracion, progreso, nota, fotoUri ->
-                alRegistrar(biblioteca.first(), duracion, progreso, nota, fotoUri)
+            alGuardar = { juego, duracion, progreso, nota, fotoUri ->
+                alRegistrar(juego, duracion, progreso, nota, fotoUri)
                 mostrarFormulario = false
             }
         )
@@ -138,16 +143,19 @@ private fun TarjetaSesion(sesion: Sesion) {
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun FormularioSesion(
-    juego: JuegoBiblioteca,
+    biblioteca: List<JuegoBiblioteca>,
     estadoPermiso: EstadoPermisoCamara,
     alSolicitarPermiso: () -> Unit,
     alCerrar: () -> Unit,
-    alGuardar: (Int, Int, String, String?) -> Unit
+    alGuardar: (JuegoBiblioteca, Int, Int, String, String?) -> Unit
 ) {
     val contexto = LocalContext.current
+    var juegoSeleccionado by remember(biblioteca) { mutableStateOf(biblioteca.first()) }
+    var selectorExpandido by remember { mutableStateOf(false) }
     var duracion by remember { mutableStateOf("60") }
-    var progreso by remember { mutableStateOf(juego.progreso.toString()) }
+    var progreso by remember { mutableStateOf(juegoSeleccionado.progreso.toString()) }
     var nota by remember { mutableStateOf("") }
     var fotoUri by remember { mutableStateOf<String?>(null) }
     var mostrarCamara by remember { mutableStateOf(false) }
@@ -187,9 +195,50 @@ private fun FormularioSesion(
     }
     AlertDialog(
         onDismissRequest = cancelarFormulario,
-        title = { Text("Nueva sesión · ${juego.titulo}") },
+        title = { Text("Nueva sesión") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                ExposedDropdownMenuBox(
+                    expanded = selectorExpandido,
+                    onExpandedChange = { selectorExpandido = !selectorExpandido }
+                ) {
+                    OutlinedTextField(
+                        value = juegoSeleccionado.titulo,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Juego") },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = selectorExpandido)
+                        },
+                        modifier = Modifier
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = selectorExpandido,
+                        onDismissRequest = { selectorExpandido = false }
+                    ) {
+                        biblioteca.forEach { juego ->
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(juego.titulo)
+                                        Text(
+                                            text = "Progreso guardado: ${juego.progreso}%",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    juegoSeleccionado = juego
+                                    progreso = juego.progreso.toString()
+                                    selectorExpandido = false
+                                }
+                            )
+                        }
+                    }
+                }
                 OutlinedTextField(
                     value = duracion,
                     onValueChange = { duracion = it.filter(Char::isDigit) },
@@ -243,7 +292,17 @@ private fun FormularioSesion(
             }
         },
         confirmButton = {
-            TextButton(onClick = { alGuardar(duracion.toIntOrNull() ?: 1, progreso.toIntOrNull() ?: 0, nota, fotoUri) }) { Text("Guardar") }
+            TextButton(
+                onClick = {
+                    alGuardar(
+                        juegoSeleccionado,
+                        duracion.toIntOrNull() ?: 1,
+                        progreso.toIntOrNull() ?: 0,
+                        nota,
+                        fotoUri
+                    )
+                }
+            ) { Text("Guardar") }
         },
         dismissButton = { TextButton(onClick = cancelarFormulario) { Text("Cancelar") } }
     )
