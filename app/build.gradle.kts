@@ -6,9 +6,32 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val archivoPropiedadesFirma = rootProject.file("keystore.properties")
 val propiedadesFirma = Properties().apply {
-    val archivo = rootProject.file("keystore.properties")
-    if (archivo.exists()) archivo.inputStream().use(::load)
+    if (archivoPropiedadesFirma.exists()) {
+        archivoPropiedadesFirma.inputStream().use(::load)
+    }
+}
+val propiedadesFirmaRequeridas = listOf(
+    "storeFile",
+    "storePassword",
+    "keyAlias",
+    "keyPassword",
+)
+val firmaReleaseConfigurada = archivoPropiedadesFirma.exists()
+
+if (firmaReleaseConfigurada) {
+    val propiedadesFaltantes = propiedadesFirmaRequeridas.filter {
+        propiedadesFirma.getProperty(it).isNullOrBlank()
+    }
+    require(propiedadesFaltantes.isEmpty()) {
+        "Faltan propiedades de firma en keystore.properties: ${propiedadesFaltantes.joinToString()}"
+    }
+
+    val archivoKeystore = rootProject.file(propiedadesFirma.getProperty("storeFile"))
+    require(archivoKeystore.isFile) {
+        "No se encontro el archivo de firma configurado: ${archivoKeystore.absolutePath}"
+    }
 }
 
 android {
@@ -19,14 +42,14 @@ android {
         applicationId = "com.example.app_savepoint"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.1"
+        versionCode = 2
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
-        if (propiedadesFirma.isNotEmpty()) {
+        if (firmaReleaseConfigurada) {
             create("release") {
                 storeFile = rootProject.file(propiedadesFirma.getProperty("storeFile"))
                 storePassword = propiedadesFirma.getProperty("storePassword")
